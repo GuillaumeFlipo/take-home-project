@@ -83,10 +83,12 @@ const Chat = ({ id1, id2, }: { id1: string, id2: string, }): JSX.Element => {
 	// i have disabled all security, so you should not worry about that :)
 
 	
-	const [messages, setMessages,] = useState<null | Messages[]>(null)
+	const [messages, setMessages,] = useState<null | Messages[]>(null) // State which will contain all the messages
 	const [messages_player_1, setMessages_player1,] = useState<null | Messages[]>(null)
 	const [messages_player_2, setMessages_player2,] = useState<null | Messages[]>(null)
 
+
+	// Each time a message is send to the server this useEffect will be called and will put messages updated
 	useEffect(()=>{
 		const Messages:Messages[] = []
 		messages_player_1?.map((val)=> Messages.push(val))
@@ -97,11 +99,12 @@ const Chat = ({ id1, id2, }: { id1: string, id2: string, }): JSX.Element => {
 
 	
 	useEffect(()=>{
+		// Snapshot on player 1 
 		onSnapshot(doc(db, `users/${id1}`), (doc1) => {
 			const messages_update: string[] | null= Object.values(doc1.data()?.messages)
 			const timeStamp: string[] | null= Object.keys(doc1.data()?.messages)
 			const Messages: Messages[] = []
-		
+			// Create a messages array with the timestamp, message and the user
 			if (messages_update && timeStamp){
 				for (let i = 0; i < messages_update.length; i++){
 					Messages.push({
@@ -113,12 +116,13 @@ const Chat = ({ id1, id2, }: { id1: string, id2: string, }): JSX.Element => {
 			}	
 			setMessages_player1(Messages)
 		  })
+		// snapshot on player 2
 		onSnapshot(doc(db, `users/${id2}`), (doc2) => {
 			const messages_update: string[] | null= Object.values(doc2.data()?.messages)
 			const timeStamp: string[] | null= Object.keys(doc2.data()?.messages)
 			const Messages: Messages[] = []
 	
-		
+			// Create a messages array with the timestamp, message and the user
 			if (messages_update && timeStamp){
 				for (let i = 0; i < messages_update.length; i++){
 					Messages.push({
@@ -135,6 +139,7 @@ const Chat = ({ id1, id2, }: { id1: string, id2: string, }): JSX.Element => {
 	}, [])
 		
 	return (
+		// Display all messages and order them according to the timeStamp
 		<ChatContainer>
 			{messages?.sort((a, b)=> toInt(a.timeStamp) - toInt(b.timeStamp)).map((val, key)=> 
 				<ChatLayout key={key} message={val} id1={id1}/>)}
